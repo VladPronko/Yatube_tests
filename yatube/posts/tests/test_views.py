@@ -103,7 +103,7 @@ class PostsPagesTests(TestCase):
         urls_with_paginator = (
             reverse('posts:index'),
             reverse('posts:group_posts', kwargs={'slug': 'test_slug'}),
-            reverse('posts:profile', kwargs={'username': 'auth'}),
+            reverse('posts:profile', kwargs={'username': PostsPagesTests.user.username}),
         )
         for urls in urls_with_paginator:
             response = self.authorized_client.get(urls)

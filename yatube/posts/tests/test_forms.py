@@ -28,6 +28,7 @@ class PostFormTests(TestCase):
         cls.form = PostForm()
 
     def setUp(self):
+        self.unauthorized_client = Client()
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
 
@@ -43,17 +44,29 @@ class PostFormTests(TestCase):
             follow=True
         )
         self.assertRedirects(
-            response,
-            reverse(
-                'posts:profile',
-                kwargs={'username': 'auth'}), HTTPStatus.FOUND)
+            response, reverse('posts:profile', kwargs={
+                'username': PostFormTests.user.username}),
+            HTTPStatus.FOUND)
         self.assertEqual(Post.objects.count(), posts_count + 1)
-        self.assertTrue(
-            Post.objects.filter(
-                group=form_data['group'],
-                text=form_data['text']
-            ).exists()
+        post = Post.objects.all()[0]
+        self.assertEqual(post.text, self.post.text)
+        self.assertEqual(post.author, self.post.author)
+        self.assertEqual(post.group, self.post.group)
+
+    def test_unauthorized_client_cannot_create_post_(self):
+        posts_count = Post.objects.count()
+        form_data = {
+            'text': self.post.text,
+            'group': self.group.id
+        }
+        response = self.unauthorized_client.post(
+            reverse('posts:post_create'),
+            data=form_data,
+            follow=True
         )
+        self.assertRedirects(
+            response, '/auth/login/?next=/create/', HTTPStatus.FOUND)
+        self.assertEqual(Post.objects.count(), posts_count)
 
     def test_post_edit(self):
         form_data = {
