@@ -29,5 +29,3 @@ class PostModelTest(TestCase):
         for field, expected_value in PostModelTest.str_model_test.items():
             with self.subTest(field=field):
                 self.assertEqual(str(field), expected_value)
-
-
