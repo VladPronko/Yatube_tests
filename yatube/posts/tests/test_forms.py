@@ -68,7 +68,7 @@ class PostFormTests(TestCase):
             # response, '/auth/login/?next=/create/', HTTPStatus.FOUND)
             response, reverse(
                 'users:login') + '?next=' + reverse(
-                    'posts:post_create'), HTTPStatus.FOUND)  
+                    'posts:post_create'), HTTPStatus.FOUND)
         self.assertEqual(Post.objects.count(), posts_count)
 
     def test_post_edit(self):
