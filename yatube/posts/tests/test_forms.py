@@ -48,7 +48,7 @@ class PostFormTests(TestCase):
                 'username': PostFormTests.user.username}),
             HTTPStatus.FOUND)
         self.assertEqual(Post.objects.count(), posts_count + 1)
-        post = Post.objects.all()[0]
+        post = Post.objects.first()
         self.assertEqual(post.text, self.post.text)
         self.assertEqual(post.author, self.post.author)
         self.assertEqual(post.group, self.post.group)
@@ -65,7 +65,10 @@ class PostFormTests(TestCase):
             follow=True
         )
         self.assertRedirects(
-            response, '/auth/login/?next=/create/', HTTPStatus.FOUND)
+            # response, '/auth/login/?next=/create/', HTTPStatus.FOUND)
+            response, reverse(
+                'users:login') + '?next=' + reverse(
+                    'posts:post_create'), HTTPStatus.FOUND)  
         self.assertEqual(Post.objects.count(), posts_count)
 
     def test_post_edit(self):
@@ -83,7 +86,7 @@ class PostFormTests(TestCase):
             reverse(
                 'posts:post_detail',
                 kwargs={'post_id': self.post.pk}), HTTPStatus.FOUND)
-        post = Post.objects.all()[0]
+        post = Post.objects.first()
         self.assertEqual(post.text, self.post.text)
         self.assertEqual(post.author, self.post.author)
         self.assertEqual(post.group, self.post.group)
